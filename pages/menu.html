@@ -1,9 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
-        <title> Menu</title>
+        <meta charset="UTF-8">
+        <title> Menu des plats </title>
+        <link rel="stylesheet" href="../css/menu.css">
     </head>
     <body>
         <h1> Bienvenue sur le menu </h1>
+        <button id="addBtn">Ajouter un plat</button>
+        <table>
+            <thead>
+                <tr>
+                    <th> Nom</th>
+                    <th>Prix (DH)</th>
+                    <th>Categorie</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="menuBody"> </tbody>
+    <!----On va ajoute ici des plats par js -->
+        </table>
+         
+     <script src="../js/menu.js"> </script>
     </body>
 </html>
