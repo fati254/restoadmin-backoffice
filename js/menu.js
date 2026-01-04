@@ -1,9 +1,26 @@
+//premierement recupere les plats qu'on a deja 
+let plats = JSON.parse(localStorage.plats || "[]" );
 //une liste juste pour le afficher maintenant
 let plats = [
 { nom: "Pizza" , Prix: 40, categorie: "Fast Food "},
 { nom: "Tajine" , Prix: 60, categorie: "Marocain "},
 { nom: "Salade" , Prix: 25, categorie: "Healthy "}
 ];
+//ou il est mieux de le remplace (pour sauvgarder )
+
+/*
+let plats;
+
+if (localStorage.plats) {
+    plats = JSON.parse(localStorage.plats);
+} else {
+    plats = [
+        { nom: "Pizza", Prix: 40, categorie: "Fast Food" },
+        { nom: "Tajine", Prix: 60, categorie: "Marocain" }
+    ];
+    localStorage.plats = JSON.stringify(plats);
+}
+*/
 
 let menuBody = document.getElementById("menuBody");
 
@@ -24,7 +41,7 @@ function afficherMenu(){
 }
 afficherMenu();
 
-//exempleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+//ajouter plat exempleeeeeeeeeee
 let addBtn = document.getElementById("addBtn");
 
 addBtn.addEventListener("click", function () {
@@ -35,10 +52,11 @@ addBtn.addEventListener("click", function () {
     if (nom && prix && categorie) {
         plats.push({
             nom: nom,
-            prix: Number(prix),
+            Prix: Number(Prix),
             categorie: categorie
         });
-
+    //pour le sauvgarder
+       localStorage.plats = JSON.stringify(plats);
         afficherMenu();
     } else {
         alert("Veuillez remplir tous les champs");
@@ -52,6 +70,8 @@ function supprimerPlat(index) {
     let confirmation = confirm("Voulez-vous vraiment supprimer ce plat ?");
     if(confirmation) {
         plats.splice(index, 1);
+        //pour sauvgarder
+        localStorage.plats = JSON.stringify(plats);
         afficherMenu();
     }
 }
@@ -68,6 +88,8 @@ function modifierPlat(index) {
         plat.nom = nouveaunom;
         plat.Prix = nouveauprix;
         plat.categorie = nouvellecategorie;
+        //sauvgarder
+        localStorage.plats = JSON.stringify(plats);
        afficherMenu();
     }
 }
