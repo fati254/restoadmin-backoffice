@@ -1,11 +1,18 @@
 //premierement recupere les plats qu'on a deja 
-let plats = JSON.parse(localStorage.plats || "[]" );
+let plats ;
+if (localStorage.plats) {
+ plats = JSON.parse(localStorage.plats);
+}
+else {
 //une liste juste pour le afficher maintenant
-let plats = [
-{ nom: "Pizza" , Prix: 40, categorie: "Fast Food "},
+ plats = [
+{ nom: "Pizza" , Prix: 40, categorie: "Fast Food " ,},
 { nom: "Tajine" , Prix: 60, categorie: "Marocain "},
 { nom: "Salade" , Prix: 25, categorie: "Healthy "}
 ];
+localStorage.plats = JSON.stringify(plats);
+}
+
 //ou il est mieux de le remplace (pour sauvgarder )
 
 /*
@@ -52,7 +59,7 @@ addBtn.addEventListener("click", function () {
     if (nom && prix && categorie) {
         plats.push({
             nom: nom,
-            Prix: Number(Prix),
+            Prix: Number(prix),
             categorie: categorie
         });
     //pour le sauvgarder
@@ -86,10 +93,41 @@ function modifierPlat(index) {
 
     if(nouveaunom && nouveauprix && nouvellecategorie ){
         plat.nom = nouveaunom;
-        plat.Prix = nouveauprix;
+        plat.Prix = Number(nouveauprix);
         plat.categorie = nouvellecategorie;
         //sauvgarder
         localStorage.plats = JSON.stringify(plats);
        afficherMenu();
     }
 }
+
+//recheeeeeeeeeeeeercher
+function afficherMenu(liste = plats) {
+    menuBody.innerHTML = "";
+
+    liste.forEach((plat, index) => {
+        let row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${plat.nom}</td>
+            <td>${plat.Prix}</td>
+            <td>${plat.categorie}</td>
+            <td>
+                <button onclick="modifierPlat(${index})">Modifier</button>
+                <button onclick="supprimerPlat(${index})">Supprimer</button>
+            </td>
+        `;
+        menuBody.appendChild(row);
+    });
+}
+let searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("input", function () {
+    let texte = searchInput.value.toLowerCase();
+
+    let resultat = plats.filter(plat =>
+        plat.nom.toLowerCase().includes(texte)
+    );
+
+    afficherMenu(resultat);
+});
+
