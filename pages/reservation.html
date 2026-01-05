@@ -2,91 +2,209 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Réservations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="reservationManagement">Gestion des Réservations</title>
 
-  <!-- Bootstrap CSS -->
+  <!-- Bootstrap 5 CSS -->
   <link 
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
     rel="stylesheet"
   >
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-  <!-- CSS -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="../css/style.css">
+  
+  <style>
+    /* Support RTL pour l'arabe */
+    [dir="rtl"] .form-label {
+      text-align: right;
+    }
+    [dir="rtl"] .table {
+      direction: rtl;
+    }
+    [dir="rtl"] .btn-group {
+      direction: ltr;
+    }
+    .language-selector {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px;
+    }
+    [dir="rtl"] .language-selector {
+      justify-content: flex-start;
+    }
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .status-confirmed {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .status-cancelled {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+    [dir="rtl"] .status-badge {
+      direction: ltr;
+    }
+    @media (max-width: 768px) {
+      .table-responsive {
+        font-size: 0.875rem;
+      }
+      .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<div class="container mt-4">
-
-  <!-- Titre -->
-  <h2 class="mb-4">Gestion des Réservations</h2>
-
-  <!-- Formulaire -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <form id="reservationForm" class="row g-3">
-
-        <div class="col-md-6">
-          <label class="form-label">Nom du client</label>
-          <input type="text" class="form-control" id="nomClient" required>
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">Date</label>
-          <input type="date" class="form-control" id="date" required>
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">Heure</label>
-          <input type="time" class="form-control" id="heure" required>
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">Nombre de personnes</label>
-          <input type="number" class="form-control" id="nbPersonnes" min="1">
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">Statut</label>
-          <select class="form-select" id="statut">
-            <option>Confirmée</option>
-            <option>En attente</option>
-            <option>Annulée</option>
-          </select>
-        </div>
-
-        <div class="col-12">
-          <button class="btn btn-primary">
-            Ajouter la réservation
-          </button>
-        </div>
-
-      </form>
-    </div>
+  <!-- Sélecteur de langue -->
+  <div class="language-selector">
+    <select id="langSelect" class="form-select form-select-sm" style="max-width: 150px;">
+      <option value="fr">🇫🇷 Français</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇲🇦 العربية</option>
+    </select>
   </div>
 
-  <div class="card">
-    <div class="card-body">
-      <table class="table table-bordered">
-        <thead class="table-light">
-          <tr>
-            <th>Client</th>
-            <th>Date</th>
-            <th>Heure</th>
-            <th>Personnes</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="reservationTable">
-        
-        </tbody>
-      </table>
+  <div class="container mt-4 mb-5">
+    
+    <!-- Titre de la page -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0" data-i18n="ReservationManagement">Gestion des Réservations</h2>
+      <a href="dashboard.html" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> <span data-i18n="dashboard">Tableau de bord</span>
+      </a>
     </div>
+
+    <!-- Formulaire d'ajout/modification -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0" data-i18n="ReservationForm">Formulaire Réservation</h5>
+      </div>
+      <div class="card-body">
+        <form id="reservationForm" class="row g-3">
+          
+          <input type="hidden" id="reservationId">
+
+          <div class="col-md-6">
+            <label for="nomClient" class="form-label" data-i18n="clientName">Nom du client</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="nomClient" 
+              data-i18n-placeholder="clientName"
+              required
+            >
+          </div>
+
+          <div class="col-md-3">
+            <label for="date" class="form-label" data-i18n="date">Date</label>
+            <input 
+              type="date" 
+              class="form-control" 
+              id="date" 
+              required
+            >
+          </div>
+
+          <div class="col-md-3">
+            <label for="heure" class="form-label" data-i18n="time">Heure</label>
+            <input 
+              type="time" 
+              class="form-control" 
+              id="heure" 
+              required
+            >
+          </div>
+
+          <div class="col-md-3">
+            <label for="nbPersonnes" class="form-label" data-i18n="numberOfPeople">Nombre de personnes</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="nbPersonnes" 
+              min="1" 
+              max="50"
+              data-i18n-placeholder="numberOfPeople"
+              required
+            >
+          </div>
+
+          <div class="col-md-3">
+            <label for="statut" class="form-label" data-i18n="status">Statut</label>
+            <select class="form-select" id="statut" required>
+              <option value="" selected disabled id="statutPlaceholder">Sélectionner un statut</option>
+              <option value="Confirmée">Confirmée</option>
+              <option value="En attente">En attente</option>
+              <option value="Annulée">Annulée</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <button type="submit" class="btn btn-success me-2">
+              <i class="bi bi-plus-circle"></i> <span data-i18n="addReservation">Ajouter la réservation</span>
+            </button>
+            <button type="button" id="btnCancel" class="btn btn-secondary" style="display: none;" onclick="cancelEdit()">
+              <i class="bi bi-x-circle"></i> <span data-i18n="cancel">Annuler</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Tableau des réservations -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="mb-0" data-i18n="Reservations">Réservations</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover table-striped">
+            <thead class="table-light">
+              <tr>
+                <th data-i18n="clientName">Client</th>
+                <th data-i18n="date">Date</th>
+                <th data-i18n="time">Heure</th>
+                <th data-i18n="numberOfPeople">Personnes</th>
+                <th data-i18n="status">Statut</th>
+                <th style="width: 150px;" data-i18n="actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reservationTable">
+              <!-- Les réservations seront affichées ici dynamiquement -->
+            </tbody>
+          </table>
+        </div>
+        <div id="noReservations" class="alert alert-info text-center" style="display: none;">
+          <i class="bi bi-info-circle"></i> <span data-i18n="noReservations">Aucune réservation enregistrée</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-</div>
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Système i18n -->
+  <script src="../js/i18n.js"></script>
+  
+  <!-- Script des réservations -->
+  <script src="../js/reservations.js"></script>
 
-<!-- JS -->
-<script src="../js/reservations.js"></script>
 </body>
 </html>
