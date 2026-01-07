@@ -7,8 +7,33 @@
     </head>
     <body>
         <h1> Bienvenue sur le menu </h1>
+             <div class="actions">
+    <button id="addBtn">Ajouter un plat</button>
+
+       <!--- filtre -->
+    <select id="filterCategorie">
+        <option value="">Toutes les catégories</option>
+        <option value="Fast Food">Fast Food</option>
+        <option value="Marocain">Marocain</option>
+        <option value="Healthy">Healthy</option>
+    </select>
+
+    <!--- tri des plat -->
+ <select id="tri">
+    <option value="">Trier</option>
+    <option value="prix-asc">Prix croissant</option>
+    <option value="prix-desc">Prix décroissant</option>
+    <option value="nom-asc">Nom A → Z</option>
+</select>
+
+
+
+    <input type="number" id="prixMin" placeholder="Prix min">
+    <input type="number" id="prixMax" placeholder="Prix max">
+</div>
+
         <div class="actions">
-        <button id="addBtn">Ajouter un plat</button>
+        
         <!--
      <div class="cards-container" id="menuCards"></div>
     --->
@@ -26,7 +51,7 @@
             <tbody id="menuBody"> </tbody>
     
         </table>
-    
+
          
      <script src="../js/menu.js"> </script>
     </body>

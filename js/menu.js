@@ -131,3 +131,45 @@ searchInput.addEventListener("input", function () {
     afficherMenu(resultat);
 });
 
+////filtre les plats 
+let filterCategorie = document.getElementById("filterCategorie");
+let prixMinInput = document.getElementById("prixMin");
+let prixMaxInput = document.getElementById("prixMax");
+
+function appliquerFiltres() {
+    let categorie = filterCategorie.value;
+    let min = prixMinInput.value ? Number(prixMinInput.value) : 0;
+    let max = prixMaxInput.value ? Number(prixMaxInput.value) : Infinity;
+
+    let resultat = plats.filter(plat => {
+        let okCategorie = categorie === "" || plat.categorie.trim() === categorie;
+        let okPrix = plat.Prix >= min && plat.Prix <= max;
+        return okCategorie && okPrix;
+    });
+
+    afficherMenu(resultat);
+}
+
+filterCategorie.addEventListener("change", appliquerFiltres);
+prixMinInput.addEventListener("input", appliquerFiltres);
+prixMaxInput.addEventListener("input", appliquerFiltres);
+
+
+///tri des plat 
+let triSelect = document.getElementById("tri");
+
+triSelect.addEventListener("change", function () {
+    let copie = [...plats];
+
+    if (this.value === "prix-asc") {
+        copie.sort((a, b) => a.Prix - b.Prix);
+    }
+    if (this.value === "prix-desc") {
+        copie.sort((a, b) => b.Prix - a.Prix);
+    }
+    if (this.value === "nom-asc") {
+        copie.sort((a, b) => a.nom.localeCompare(b.nom));
+    }
+
+    afficherMenu(copie);
+});
