@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tables</title>
+</head>
+<body>
+
+<h2>Gestion des Tables</h2>
+
+<input type="text" id="numero" placeholder="Numéro de table">
+<input type="number" id="places" placeholder="Nombre de places">
+<button onclick="addTable()">Ajouter</button>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Table</th>
+      <th>Places</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="tableList"></tbody>
+</table>
+
+<script src="js/tables.js"></script>
+</body>
+</html>

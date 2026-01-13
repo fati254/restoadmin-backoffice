@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Commandes</title>
+</head>
+<body>
+
+<h2>Gestion des Commandes</h2>
+
+<input type="text" id="table" placeholder="Table">
+<input type="number" id="total" placeholder="Total">
+<select id="status">
+  <option>En attente</option>
+  <option>Servie</option>
+</select>
+
+<button onclick="addCommande()">Ajouter</button>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Table</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="commandeList"></tbody>
+</table>
+
+<script src="js/commandes.js"></script>
+</body>
+</html>
