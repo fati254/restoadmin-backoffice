@@ -1,9 +1,7 @@
-// GESTION DES EMPLOYÉS - CRUD complet avec support multilingue
-// Variable pour stocker l'ID de l'employé en cours de modification
-let employeeEnCours = null;
+let employeeEnCours = null; // ID de l'employé en cours de modification
 
 // Charger les employés depuis LocalStorage
-let employees = JSON.parse(localStorage.getItem("employees")) || [];
+let employees = JSON.parse(localStorage.getItem("employees") || "[]");
 
 // Références aux éléments du DOM
 const employeeForm = document.getElementById("employeForm");
@@ -11,31 +9,54 @@ const employeeTable = document.getElementById("employeTable");
 const btnCancel = document.getElementById("btnCancel");
 const btnSubmit = employeeForm.querySelector('button[type="submit"]');
 
-// Initialiser la langue au chargement
-document.addEventListener('DOMContentLoaded', function() {
-  // Attendre un peu pour que i18n.js soit chargé
-  setTimeout(function() {
-    if (typeof applyLanguage === 'function' && typeof getCurrentLanguage === 'function') {
-      applyLanguage(getCurrentLanguage());
-    }
-    
-    // Initialiser le sélecteur de langue s'il existe
-    const langSelect = document.getElementById('langSelect');
-    if (langSelect && typeof getCurrentLanguage === 'function') {
-      langSelect.value = getCurrentLanguage();
-      langSelect.addEventListener('change', function(e) {
-        if (typeof setLanguage === 'function') {
-          setLanguage(e.target.value);
-        }
-      });
-    }
-    
-    // Afficher les employés existants
-    afficherEmployees();
-  }, 100);
-});
+// Fonction helper pour i18n sécurisé
+function tr(key) {
+  return (typeof t === 'function') ? t(key) : key;
+}
 
-// Gestion du formulaire - Ajout ou Modification
+// Afficher tous les employés
+function afficherEmployees() {
+  employeeTable.innerHTML = "";
+
+  const noEmployees = document.getElementById("noEmployees");
+  if (!noEmployees) return;
+
+  if (employees.length === 0) {
+    noEmployees.style.display = "block";
+    return;
+  } else {
+    noEmployees.style.display = "none";
+  }
+
+  employees.forEach(emp => {
+    let roleText = emp.role;
+    if (emp.role === 'Serveur') roleText = tr('server');
+    else if (emp.role === 'Caissier') roleText = tr('cashier');
+    else if (emp.role === 'Manager') roleText = tr('manager');
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${escapeHtml(emp.nom)}</td>
+      <td>${escapeHtml(roleText)}</td>
+      <td>${escapeHtml(emp.telephone || '-')}</td>
+      <td>
+        <button class="btn btn-warning btn-sm me-1" onclick="modifierEmployee(${emp.id})" title="${tr('edit')}">
+          <i class="bi bi-pencil"></i> <span data-i18n="edit">Modifier</span>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="supprimerEmployee(${emp.id})" title="${tr('delete')}">
+          <i class="bi bi-trash"></i> <span data-i18n="delete">Supprimer</span>
+        </button>
+      </td>
+    `;
+    employeeTable.appendChild(row);
+  });
+
+  if (typeof applyLanguage === 'function') {
+    applyLanguage(getCurrentLanguage());
+  }
+}
+
+// Ajouter ou modifier un employé
 employeeForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
@@ -43,177 +64,102 @@ employeeForm.addEventListener("submit", function (e) {
   const role = document.getElementById("role").value;
   const telephone = document.getElementById("telephone").value.trim();
 
-  // Validation
   if (!nom || !role) {
-    alert(t('name') + ' et ' + t('role') + ' sont requis');
+    alert(tr('name') + ' et ' + tr('role') + ' sont requis');
     return;
   }
 
   if (employeeEnCours) {
-    // MODIFICATION d'un employé existant
     const index = employees.findIndex(emp => emp.id === employeeEnCours);
-
     if (index !== -1) {
-      employees[index] = {
-        id: employeeEnCours,
-        nom: nom,
-        role: role,
-        telephone: telephone
-      };
-
+      employees[index] = { id: employeeEnCours, nom, role, telephone };
       sauvegarder();
       afficherEmployees();
       resetForm();
-      
-      // Message de succès multilingue
-      alert(t('employeeUpdated'));
+      alert(tr('employeeUpdated'));
     }
   } else {
-    // AJOUT d'un nouvel employé
-    const newEmployee = {
-      id: Date.now(), // Utiliser un timestamp comme ID unique
-      nom: nom,
-      role: role,
-      telephone: telephone
-    };
-
+    const newEmployee = { id: Date.now(), nom, role, telephone };
     employees.push(newEmployee);
     sauvegarder();
     afficherEmployees();
     resetForm();
-    
-    // Message de succès multilingue
-    alert(t('employeeAdded'));
+    alert(tr('employeeAdded'));
   }
 });
 
-// Fonction pour afficher tous les employés dans le tableau
-function afficherEmployees() {
-  employeeTable.innerHTML = "";
-
-  if (employees.length === 0) {
-    document.getElementById("noEmployees").style.display = "block";
-    return;
-  }
-
-  document.getElementById("noEmployees").style.display = "none";
-
-  employees.forEach(emp => {
-    const row = document.createElement("tr");
-    
-    // Obtenir les traductions pour les rôles
-    let roleText = emp.role;
-    if (emp.role === 'Serveur') roleText = t('server');
-    else if (emp.role === 'Caissier') roleText = t('cashier');
-    else if (emp.role === 'Manager') roleText = t('manager');
-    
-    row.innerHTML = `
-      <td>${escapeHtml(emp.nom)}</td>
-      <td>${escapeHtml(roleText)}</td>
-      <td>${escapeHtml(emp.telephone || '-')}</td>
-      <td>
-        <button 
-          class="btn btn-warning btn-sm me-1" 
-          onclick="modifierEmployee(${emp.id})"
-          title="${t('edit')}"
-        >
-          <i class="bi bi-pencil"></i> <span data-i18n="edit">Modifier</span>
-        </button>
-        <button 
-          class="btn btn-danger btn-sm" 
-          onclick="supprimerEmployee(${emp.id})"
-          title="${t('delete')}"
-        >
-          <i class="bi bi-trash"></i> <span data-i18n="delete">Supprimer</span>
-        </button>
-      </td>
-    `;
-    
-    employeeTable.appendChild(row);
-  });
-  
-  // Réappliquer les traductions après l'ajout dynamique
-  if (typeof applyLanguage === 'function') {
-    applyLanguage(getCurrentLanguage());
-  }
-}
-
-// Fonction pour modifier un employé
+// Modifier un employé
 function modifierEmployee(id) {
-  const employee = employees.find(emp => emp.id === id);
+  const emp = employees.find(e => e.id === id);
+  if (!emp) { alert(tr('employeeNotFound')); return; }
 
-  if (!employee) {
-    alert("Employé introuvable");
-    return;
-  }
+  document.getElementById("employeId").value = emp.id;
+  document.getElementById("nom").value = emp.nom;
+  document.getElementById("role").value = emp.role;
+  document.getElementById("telephone").value = emp.telephone || '';
 
-  // Remplir le formulaire avec les données de l'employé
-  document.getElementById("employeId").value = employee.id;
-  document.getElementById("nom").value = employee.nom;
-  document.getElementById("role").value = employee.role;
-  document.getElementById("telephone").value = employee.telephone || '';
-
-  // Activer le mode modification
   employeeEnCours = id;
   btnCancel.style.display = "inline-block";
   btnSubmit.innerHTML = `<i class="bi bi-save"></i> <span data-i18n="save">Enregistrer</span>`;
-  
-  // Scroll vers le formulaire
   employeeForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  
-  // Focus sur le premier champ
   document.getElementById("nom").focus();
-  
-  // Réappliquer les traductions
-  if (typeof applyLanguage === 'function') {
-    applyLanguage(getCurrentLanguage());
-  }
+  if (typeof applyLanguage === 'function') applyLanguage(getCurrentLanguage());
 }
 
-// Fonction pour supprimer un employé
+// Supprimer un employé
 function supprimerEmployee(id) {
-  if (confirm(t('confirmDeleteEmployee'))) {
+  if (confirm(tr('confirmDeleteEmployee'))) {
     employees = employees.filter(emp => emp.id !== id);
     sauvegarder();
     afficherEmployees();
-    
-    // Message de succès multilingue
-    alert(t('employeeDeleted'));
+    alert(tr('employeeDeleted'));
   }
 }
 
-// Fonction pour annuler la modification en cours
+// Annuler la modification
 function cancelEdit() {
   resetForm();
 }
 
-// Fonction pour réinitialiser le formulaire
+// Réinitialiser le formulaire
 function resetForm() {
   employeeForm.reset();
   document.getElementById("employeId").value = '';
   employeeEnCours = null;
   btnCancel.style.display = "none";
   btnSubmit.innerHTML = `<i class="bi bi-plus-circle"></i> <span data-i18n="addEmployee">Ajouter l'employé</span>`;
-  
-  // Réappliquer les traductions
-  if (typeof applyLanguage === 'function') {
-    applyLanguage(getCurrentLanguage());
-  }
+  if (typeof applyLanguage === 'function') applyLanguage(getCurrentLanguage());
 }
 
-// Fonction pour sauvegarder dans LocalStorage
+// Sauvegarder dans LocalStorage
 function sauvegarder() {
   localStorage.setItem("employees", JSON.stringify(employees));
 }
 
-// Fonction utilitaire pour échapper le HTML (sécurité XSS)
+// Échapper le HTML pour sécurité XSS
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// Exporter les fonctions pour qu'elles soient accessibles globalement
+// Exporter les fonctions globales
 window.modifierEmployee = modifierEmployee;
 window.supprimerEmployee = supprimerEmployee;
 window.cancelEdit = cancelEdit;
+
+// Initialisation au chargement
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    afficherEmployees();
+
+    // Sélecteur langue
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect && typeof getCurrentLanguage === 'function') {
+      langSelect.value = getCurrentLanguage();
+      langSelect.addEventListener('change', e => {
+        if (typeof setLanguage === 'function') setLanguage(e.target.value);
+      });
+    }
+  }, 100);
+});

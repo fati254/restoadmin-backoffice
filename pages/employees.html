@@ -24,6 +24,7 @@
   </nav>
 
   <div class="container">
+    <!-- FORMULAIRE AJOUT/MODIF EMPLOYÉ -->
     <form id="employeForm" class="card p-3 mb-4">
       <input type="hidden" id="employeId">
       <div class="row g-3">
@@ -48,13 +49,18 @@
         <button type="submit" class="btn btn-primary">
           <i class="bi bi-plus-circle"></i> <span data-i18n="addEmployee">Ajouter l'employé</span>
         </button>
-        <!-- ID corrigé pour matcher le JS -->
         <button type="button" id="btnCancel" class="btn btn-secondary" style="display:none;" onclick="cancelEdit()">
           <i class="bi bi-x-circle"></i> <span data-i18n="cancel">Annuler</span>
         </button>
       </div>
     </form>
 
+    <!-- MESSAGE SI AUCUN EMPLOYÉ -->
+    <div id="noEmployees" class="alert alert-info text-center" style="display: none;">
+      <i class="bi bi-info-circle"></i> Aucun employé enregistré
+    </div>
+
+    <!-- TABLEAU DES EMPLOYÉS -->
     <div class="table-responsive">
       <table class="table table-striped align-middle">
         <thead>
