@@ -1,14 +1,48 @@
-document.getElementById("loginform").addEventListener( "submit" , function(e){
- e.preventDefault();
-const user = document.getElementById("username").value;
-const code = document.getElementById("password").value;
+// LOGIN - Authentification simple avec redirection vers dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById("loginform");
+    
+    if (!loginForm) return;
+    
+    loginForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        const user = document.getElementById("username").value;
+        const code = document.getElementById("password").value;
+        const errorElement = document.getElementById("error");
 
-if( user === "admin" && code === "1234" ){
-    window.location.href="menu.html";
-}
-else{
-    document.getElementById("error").textContent="Identifiants Incorrects";
-}
-} );
+        if (user === "admin" && code === "1234") {
+            // Sauvegarder l'utilisateur dans localStorage
+            localStorage.setItem("user", JSON.stringify({ username: user, loggedIn: true }));
+            
+            // Rediriger vers le dashboard
+            window.location.href = "dashboard.html";
+        } else {
+            if (errorElement) {
+                // Utiliser traductions si disponibles
+                const errorMsg = (typeof t === 'function') ? t('invalidCredentials') : "Identifiants Incorrects";
+                errorElement.textContent = errorMsg;
+            }
+        }
+    });
+    
+    // Initialiser le sélecteur de langue
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect && typeof getCurrentLanguage === 'function') {
+        langSelect.value = getCurrentLanguage();
+        langSelect.addEventListener('change', function(e) {
+            if (typeof setLanguage === 'function') {
+                setLanguage(e.target.value);
+            }
+        });
+    }
+    
+    // Réappliquer les traductions si disponibles
+    setTimeout(function() {
+        if (typeof applyLanguage === 'function' && typeof getCurrentLanguage === 'function') {
+            applyLanguage(getCurrentLanguage());
+        }
+    }, 100);
+});
 
 

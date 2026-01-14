@@ -39,7 +39,7 @@ h1 {
 table {
     width: 100%;
     border-collapse: collapse;
-      background-color: white;
+    background-color: white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
@@ -79,4 +79,24 @@ button:nth-child(2) {
 
 button:hover {
     opacity: 0.85;
+}
+
+/* MENU PAGE - Styles spécifiques */
+.menu-container {
+  padding: 20px 0;
+}
+
+.menu-header {
+  margin-bottom: 2rem;
+}
+
+/* Responsive pour le menu */
+@media (max-width: 768px) {
+  .menu-container {
+    padding: 15px 0;
+  }
+  
+  .table-responsive {
+    font-size: 0.85rem;
+  }
 }

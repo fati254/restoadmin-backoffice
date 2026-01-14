@@ -1,0 +1,82 @@
+/* LOGIN PAGE - Styles spécifiques */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border-radius: 1rem;
+  border: none;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.login-card .card-body {
+  padding: 2.5rem;
+}
+
+.login-card h2 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.login-card .text-muted {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.login-card .form-label {
+  color: #495057;
+  font-weight: 500;
+}
+
+.login-card .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 0.75rem;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.login-card .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+.login-card .alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .login-card .card-body {
+    padding: 1.5rem;
+  }
+  
+  .login-card h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

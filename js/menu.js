@@ -1,175 +1,124 @@
-//premierement recupere les plats qu'on a deja 
-let plats ;
-if (localStorage.plats) {
- plats = JSON.parse(localStorage.plats);
-}
-else {
-//une liste juste pour le afficher maintenant
- plats = [
-{ nom: "Pizza" , Prix: 40, categorie: "Fast Food " ,},
-{ nom: "Tajine" , Prix: 60, categorie: "Marocain "},
-{ nom: "Salade" , Prix: 25, categorie: "Healthy "}
-];
-localStorage.plats = JSON.stringify(plats);
-}
+// MENU - Gestion des plats avec support multilingue
+let plats = JSON.parse(localStorage.getItem("plats") || "[]");
 
-//ou il est mieux de le remplace (pour sauvgarder )
-
-/*
-let plats;
-
-if (localStorage.plats) {
-    plats = JSON.parse(localStorage.plats);
-} else {
-    plats = [
-        { nom: "Pizza", Prix: 40, categorie: "Fast Food" },
-        { nom: "Tajine", Prix: 60, categorie: "Marocain" }
-    ];
-    localStorage.plats = JSON.stringify(plats);
-}
-*/
-
-let menuBody = document.getElementById("menuBody");
-
-function afficherMenu(){
+// Fonction pour afficher le menu
+function afficherMenu() {
+    const menuBody = document.getElementById("menuBody");
+    const noPlats = document.getElementById("noPlats");
+    
+    if (!menuBody) return;
+    
     menuBody.innerHTML = "";
+    
+    if (plats.length === 0) {
+        if (noPlats) noPlats.style.display = "block";
+        return;
+    }
+    
+    if (noPlats) noPlats.style.display = "none";
+    
     plats.forEach((plat, index) => {
-        let row =  document.createElement("tr");
+        const row = document.createElement("tr");
+        const prix = plat.prix || plat.Prix || 0;
         row.innerHTML = `
-        <td>${plat.nom}</td>
-        <td>${plat.Prix}</td>
-        <td>${plat.categorie}</td>
-          <td> 
-            <button onclick="modifierPlat(${index})" > Modifier </button>
-            <button onclick="supprimerPlat(${index})" > Supprimer </button>
-          </td> `;
-        menuBody.appendChild(row);
-    } );
-}
-afficherMenu();
-
-//ajouter plat exempleeeeeeeeeee
-let addBtn = document.getElementById("addBtn");
-
-addBtn.addEventListener("click", function () {
-    let nom = prompt("Nom du plat :");
-    let prix = prompt("Prix du plat :");
-    let categorie = prompt("Categorie du plat :");
-
-    if (nom && prix && categorie) {
-        plats.push({
-            nom: nom,
-            Prix: Number(prix),
-            categorie: categorie
-        });
-    //pour le sauvgarder
-       localStorage.plats = JSON.stringify(plats);
-        afficherMenu();
-    } else {
-        alert("Veuillez remplir tous les champs");
-    }
-});
-
-console.log("le menu.js fonction");
-
-// fct pour suppression 
-function supprimerPlat(index) {
-    let confirmation = confirm("Voulez-vous vraiment supprimer ce plat ?");
-    if(confirmation) {
-        plats.splice(index, 1);
-        //pour sauvgarder
-        localStorage.plats = JSON.stringify(plats);
-        afficherMenu();
-    }
-}
-
-//fct pour modification
-function modifierPlat(index) {
-    let plat = plats[index];
-
-    let nouveaunom = prompt("Entrez  le nouveau nom", plat.nom);
-    let nouveauprix = prompt("Entrez le nouveau prix", plat.Prix);
-    let nouvellecategorie = prompt("Entrez le nouvelle categorie", plat.categorie);
-
-    if(nouveaunom && nouveauprix && nouvellecategorie ){
-        plat.nom = nouveaunom;
-        plat.Prix = Number(nouveauprix);
-        plat.categorie = nouvellecategorie;
-        //sauvgarder
-        localStorage.plats = JSON.stringify(plats);
-       afficherMenu();
-    }
-}
-
-//recheeeeeeeeeeeeercher
-function afficherMenu(liste = plats) {
-    menuBody.innerHTML = "";
-
-    liste.forEach((plat, index) => {
-        let row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${plat.nom}</td>
-            <td>${plat.Prix}</td>
-            <td>${plat.categorie}</td>
+            <td>${escapeHtml(plat.nom)}</td>
+            <td>${prix} DH</td>
+            <td>${escapeHtml(plat.categorie || '')}</td>
             <td>
-                <button onclick="modifierPlat(${index})">Modifier</button>
-                <button onclick="supprimerPlat(${index})">Supprimer</button>
+                <button class="btn btn-warning btn-sm me-1" onclick="modifierPlat(${index})" title="${typeof t === 'function' ? t('edit') : 'Modifier'}">
+                    <i class="bi bi-pencil"></i> <span data-i18n="edit">Modifier</span>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="supprimerPlat(${index})" title="${typeof t === 'function' ? t('delete') : 'Supprimer'}">
+                    <i class="bi bi-trash"></i> <span data-i18n="delete">Supprimer</span>
+                </button>
             </td>
         `;
         menuBody.appendChild(row);
     });
-}
-let searchInput = document.getElementById("searchInput");
 
-searchInput.addEventListener("input", function () {
-    let texte = searchInput.value.toLowerCase();
-
-    let resultat = plats.filter(plat =>
-        plat.nom.toLowerCase().includes(texte)
-    );
-
-    afficherMenu(resultat);
-});
-
-////filtre les plats 
-let filterCategorie = document.getElementById("filterCategorie");
-let prixMinInput = document.getElementById("prixMin");
-let prixMaxInput = document.getElementById("prixMax");
-
-function appliquerFiltres() {
-    let categorie = filterCategorie.value;
-    let min = prixMinInput.value ? Number(prixMinInput.value) : 0;
-    let max = prixMaxInput.value ? Number(prixMaxInput.value) : Infinity;
-
-    let resultat = plats.filter(plat => {
-        let okCategorie = categorie === "" || plat.categorie.trim() === categorie;
-        let okPrix = plat.Prix >= min && plat.Prix <= max;
-        return okCategorie && okPrix;
-    });
-
-    afficherMenu(resultat);
+    // Réappliquer les traductions si disponibles
+    setTimeout(function() {
+        if (typeof applyLanguage === 'function' && typeof getCurrentLanguage === 'function') {
+            applyLanguage(getCurrentLanguage());
+        }
+    }, 100);
 }
 
-filterCategorie.addEventListener("change", appliquerFiltres);
-prixMinInput.addEventListener("input", appliquerFiltres);
-prixMaxInput.addEventListener("input", appliquerFiltres);
+// Fonction utilitaire pour échapper le HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
-
-///tri des plat 
-let triSelect = document.getElementById("tri");
-
-triSelect.addEventListener("change", function () {
-    let copie = [...plats];
-
-    if (this.value === "prix-asc") {
-        copie.sort((a, b) => a.Prix - b.Prix);
+// Supprimer un plat
+function supprimerPlat(index) {
+    if (confirm("Voulez-vous vraiment supprimer ce plat ?")) {
+        plats.splice(index, 1);
+        localStorage.setItem("plats", JSON.stringify(plats));
+        afficherMenu();
     }
-    if (this.value === "prix-desc") {
-        copie.sort((a, b) => b.Prix - a.Prix);
-    }
-    if (this.value === "nom-asc") {
-        copie.sort((a, b) => a.nom.localeCompare(b.nom));
-    }
+}
 
-    afficherMenu(copie);
+// Modifier un plat
+function modifierPlat(index) {
+    const plat = plats[index];
+    if (!plat) return;
+
+    const prixActuel = plat.prix || plat.Prix || 0;
+    
+    const nouveaunom = prompt("Entrez le nouveau nom", plat.nom);
+    const nouveauprix = prompt("Entrez le nouveau prix", prixActuel);
+    const nouvellecategorie = prompt("Entrez la nouvelle categorie", plat.categorie);
+
+    if (nouveaunom && nouveauprix && nouvellecategorie) {
+        plat.nom = nouveaunom.trim();
+        plat.prix = Number(nouveauprix);
+        plat.categorie = nouvellecategorie.trim();
+        localStorage.setItem("plats", JSON.stringify(plats));
+        afficherMenu();
+    }
+}
+
+// Exporter les fonctions pour global
+window.modifierPlat = modifierPlat;
+window.supprimerPlat = supprimerPlat;
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const menuBody = document.getElementById("menuBody");
+        const addBtn = document.getElementById("addBtn");
+        const langSelect = document.getElementById('langSelect');
+
+        if (langSelect && typeof getCurrentLanguage === 'function') {
+            langSelect.value = getCurrentLanguage();
+            langSelect.addEventListener('change', function(e) {
+                if (typeof setLanguage === 'function') setLanguage(e.target.value);
+            });
+        }
+
+        if (menuBody) afficherMenu();
+
+        if (addBtn) {
+            addBtn.addEventListener("click", function () {
+                const nom = prompt("Nom du plat :");
+                const prix = prompt("Prix du plat :");
+                const categorie = prompt("Categorie du plat :");
+
+                if (nom && prix && categorie) {
+                    plats.push({ id: Date.now(), nom: nom.trim(), prix: Number(prix), categorie: categorie.trim() });
+                    localStorage.setItem("plats", JSON.stringify(plats));
+                    afficherMenu();
+                } else {
+                    alert("Veuillez remplir tous les champs");
+                }
+            });
+        }
+
+        if (typeof applyLanguage === 'function' && typeof getCurrentLanguage === 'function') {
+            applyLanguage(getCurrentLanguage());
+        }
+    }, 100);
 });
