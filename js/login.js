@@ -1,5 +1,8 @@
 // LOGIN - Authentification simple avec redirection vers dashboard
 document.addEventListener('DOMContentLoaded', function() {
+    // Clear existing session to allow re-login
+    localStorage.removeItem("user");
+
     const loginForm = document.getElementById("loginform");
     
     if (!loginForm) return;
@@ -16,7 +19,11 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem("user", JSON.stringify({ username: user, loggedIn: true }));
             
             // Rediriger vers le dashboard
-            window.location.href = "dashboard.html";
+            if (window.location.pathname.includes('/pages/')) {
+                window.location.href = "dashboard.html";
+            } else {
+                window.location.href = "pages/dashboard.html";
+            }
         } else {
             if (errorElement) {
                 // Utiliser traductions si disponibles
